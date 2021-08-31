@@ -1,0 +1,72 @@
+name: temperature and humidity sensor profile
+manufacturer: xx
+model: SNMP
+labels: [Temperature,Humidity]
+description: temperature and humidity sensor profile
+deviceResources:
+- description: sensor temperature
+  name: TemperatureDeg
+  properties:
+    value:
+      type: INT16
+      readWrite: R
+      defaultValue: "0"
+      size: "1"
+      scale: "0.1"
+      mediatype: ""
+    units:
+      type: String
+      readWrite: R
+  attributes:
+    primaryTable: HOLDING_REGISTERS
+    startingAddress: "2"
+- description: sensor humidity
+  name: Humidity
+  properties:
+    value:
+      type: INT16
+      readWrite: R
+      defaultValue: "0"
+      size: "1"
+      scale: "0.1"
+      mediatype: ""
+    units:
+      type: String
+      readWrite: R
+  attributes:
+    primaryTable: HOLDING_REGISTERS
+    startingAddress: "1"
+deviceCommands:
+- name: TemperatureDeg
+  get:
+  - index: "1"
+    operation: get
+    object: TemperatureDeg
+    parameter: TemperatureDeg
+- name: Humidity
+  get:
+  - index: "1"
+    operation: get
+    object: Humidity
+    parameter: Humidity
+coreCommands:
+- name: TemperatureDeg
+  get:
+    path: /api/v1/device/{deviceId}/TemperatureDeg
+    responses:
+    - code: "200"
+      description: Get the temperature in degrees F
+      expectedValues:
+      - TemperatureDeg
+    - code: "503"
+      description: service unavailable
+- name: Humidity
+  get:
+    path: /api/v1/device/{deviceId}/Humidity
+    responses:
+    - code: "200"
+      description: Get the Humidity
+      expectedValues:
+      - Humidity
+    - code: "503"
+      description: service unavailable
