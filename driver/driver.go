@@ -27,12 +27,12 @@ var once sync.Once
 var driver *Driver
 
 type Driver struct {
-	lc            logger.LoggingClient
-	asyncCh       chan<- *dsModels.AsyncValues
+	lc      logger.LoggingClient
+	asyncCh chan<- *dsModels.AsyncValues
 }
 
 type Data struct {
-	hum string
+	hum  string
 	temp string
 }
 
@@ -70,8 +70,8 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	apiUrl := "http://localhost:8093/snmpread"
 
 	param := url.Values{}
-	param.Set("post",addr)
-	param.Set("port",port)
+	param.Set("post", addr)
+	param.Set("port", port)
 
 	u, err := url.ParseRequestURI(apiUrl)
 	if err != nil {
@@ -89,23 +89,23 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 
 	var dt Data
 
-	if err := json.Unmarshal(b,&dt); err != nil{
+	if err := json.Unmarshal(b, &dt); err != nil {
 		fmt.Printf("json.Unmarsha jsonStr1 failed, err:%v\n", err)
-		return nil,err
+		return nil, err
 	}
 
-	var v int
+	var v float64
 
 	if reqs[0].DeviceResourceName == "TemperatureDeg" {
-		v,_ = strconv.Atoi(dt.temp)
-	} else{
-		v,_ = strconv.Atoi(dt.hum)
+		v, _ = strconv.ParseFloat(dt.temp, 64)
+	} else {
+		v, _ = strconv.ParseFloat(dt.hum, 64)
 	}
 
-	cv, _ := dsModels.NewInt64Value(reqs[0].DeviceResourceName, now, int64(v))
+	cv, _ := dsModels.NewFloat64Value(reqs[0].DeviceResourceName, now, v)
 	res[0] = cv
 
-	return res,nil
+	return res, nil
 }
 
 func (d *Driver) HandleWriteCommands(deviceName string, protocols map[string]models.ProtocolProperties, reqs []dsModels.CommandRequest,
