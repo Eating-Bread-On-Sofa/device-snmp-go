@@ -62,7 +62,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	var SNMP = protocols["snmp"]
 	addr := SNMP["Address"]
 	port := SNMP["Port"]
-	apiUrl := "http://localhost:8093/snmpread"
+	apiUrl := "http://localhost:7093/snmpread"
 
 	param := url.Values{}
 	param.Set("post", addr)
@@ -88,16 +88,17 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 		fmt.Printf("json.Unmarsha jsonStr1 failed, err:%v\n", err)
 		return nil, err
 	}
-
 	var v float64
 
 	if reqs[0].DeviceResourceName == "TemperatureDeg" {
 		v, _ = strconv.ParseFloat(fmt.Sprint(dt["temp"]), 64)
 	} else {
-		v, _ = strconv.ParseFloat(fmt.Sprint(dt["temp"]), 64)
+		v, _ = strconv.ParseFloat(fmt.Sprint(dt["hum"]), 64)
 	}
 
-	cv, _ := dsModels.NewFloat64Value(reqs[0].DeviceResourceName, now, v)
+	var daa int64
+	daa = int64(v)
+	cv, _ := dsModels.NewInt64Value(reqs[0].DeviceResourceName, now, daa)
 	res[0] = cv
 
 	return res, nil
