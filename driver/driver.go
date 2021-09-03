@@ -31,11 +31,6 @@ type Driver struct {
 	asyncCh chan<- *dsModels.AsyncValues
 }
 
-type Data struct {
-	hum  string
-	temp string
-}
-
 func NewProtocolDriver() dsModels.ProtocolDriver {
 	once.Do(func() {
 		driver = new(Driver)
@@ -87,7 +82,7 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	defer resp.Body.Close()
 	b, err := ioutil.ReadAll(resp.Body)
 
-	var dt Data
+	var dt map[string]interface{}
 
 	if err := json.Unmarshal(b, &dt); err != nil {
 		fmt.Printf("json.Unmarsha jsonStr1 failed, err:%v\n", err)
@@ -97,9 +92,9 @@ func (d *Driver) HandleReadCommands(deviceName string, protocols map[string]mode
 	var v float64
 
 	if reqs[0].DeviceResourceName == "TemperatureDeg" {
-		v, _ = strconv.ParseFloat(dt.temp, 64)
+		v, _ = strconv.ParseFloat(fmt.Sprint(dt["temp"]), 64)
 	} else {
-		v, _ = strconv.ParseFloat(dt.hum, 64)
+		v, _ = strconv.ParseFloat(fmt.Sprint(dt["temp"]), 64)
 	}
 
 	cv, _ := dsModels.NewFloat64Value(reqs[0].DeviceResourceName, now, v)
